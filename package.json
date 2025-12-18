@@ -1,0 +1,21 @@
+{
+  "name": "shamela-api-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "🕌 خادم API للمكتبة الشاملة - دلائل AI",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "test": "node test_shamela.js",
+    "start": "node server.js",
+    "build": "echo 'No build required'"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.2"
+  }
+}
