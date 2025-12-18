@@ -518,6 +518,82 @@ app.get('/api/search', (req, res) => {
     });
 });
 
+
+
+// مزامنة Master (GET للسهولة)
+app.get('/api/sync/master', async (req, res) => {
+    try {
+        const savedVersion = getSavedVersion('master');
+        const url = `${CONFIG.BASE_URL}/patches/master?api_key=${CONFIG.API_KEY}&version=${savedVersion.version}`;
+        
+        const response = await fetch(url);
+        
+        if (response.status === 204) {
+            return res.json({ 
+                success: true, 
+                message: "البيانات محدثة",
+                version: savedVersion.version 
+            });
+        }
+        
+        if (!response.ok) {
+            throw new Error(`خطأ: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.patch_url) {
+            const masterData = await downloadAndExtract(data.patch_url);
+            
+            const existingMaster = loadMasterData();
+            
+            ['category', 'book', 'author'].forEach(table => {
+                if (masterData[table]) {
+                    masterData[table].forEach(update => {
+                        if (update.is_deleted === '1' || update.is_deleted === 1) {
+                            existingMaster[table] = (existingMaster[table] || [])
+                                .filter(item => item.id !== update.id);
+                        } else {
+                            const idx = (existingMaster[table] || [])
+                                .findIndex(item => item.id === update.id);
+                            if (idx >= 0) {
+                                Object.keys(update).forEach(key => {
+                                    if (update[key] !== '#' && update[key] !== null) {
+                                        existingMaster[table][idx][key] = update[key];
+                                    }
+                                });
+                            } else {
+                                existingMaster[table] = existingMaster[table] || [];
+                                existingMaster[table].push(update);
+                            }
+                        }
+                    });
+                }
+            });
+            
+            const masterPath = path.join(CONFIG.DATA_DIR, 'master.json');
+            fs.writeFileSync(masterPath, JSON.stringify(existingMaster, null, 2));
+            saveVersion('master', { version: data.Version });
+            
+            return res.json({
+                success: true,
+                message: "تم التحديث",
+                version: data.Version,
+                stats: {
+                    categories: existingMaster.category?.length || 0,
+                    books: existingMaster.book?.length || 0,
+                    authors: existingMaster.author?.length || 0
+                }
+            });
+        }
+        
+        res.json({ success: true, message: "لا توجد تحديثات" });
+        
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // مزامنة Master
 app.post('/api/sync/master', async (req, res) => {
     try {
