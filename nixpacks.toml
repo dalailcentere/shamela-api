@@ -9,4 +9,3 @@ cmds = ["echo 'No build needed'"]
 
 [start]
 cmd = "node server.js"
-```
