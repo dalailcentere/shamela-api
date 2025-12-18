@@ -33,7 +33,7 @@ const CONFIG = {
     BASE_URL: "https://dev.shamela.ws/api/v1",
     DATA_DIR: "./shamela_data",
     CACHE_DIR: "./shamela_cache",
-    PORT: 3001
+   PORT: process.env.PORT || 3001
 };
 
 // ==================== تهيئة المجلدات ====================
