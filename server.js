@@ -607,7 +607,7 @@ app.get('/api/sync/master', async (req, res) => {
 app.post('/api/sync/master', async (req, res) => {
     try {
         const savedVersion = getSavedVersion('master');
-        const url = `${CONFIG.BASE_URL}/patches/master?api_key=${CONFIG.API_KEY}&version=${savedVersion.version}`;
+       const url = `${CONFIG.BASE_URL}/patches/master?api_key=${CONFIG.API_KEY}&version=0`;
         
         const response = await fetch(url);
         
