@@ -524,7 +524,7 @@ app.get('/api/sync/master', async (req, res) => {
         console.log('🔄 بدء المزامنة...');
         
         // جلب بدون version للحصول على كل البيانات
-        const url = `${CONFIG.BASE_URL}/patches/master?api_key=${CONFIG.API_KEY}`;
+const url = `${CONFIG.BASE_URL}/patches/master?api_key=${CONFIG.API_KEY}&version=0`;
         console.log('🌐 جلب من:', url);
         
         const response = await fetch(url);
